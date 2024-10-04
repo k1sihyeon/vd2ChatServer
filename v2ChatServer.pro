@@ -10,9 +10,13 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
+    message.cpp \
+    user.cpp \
     widget.cpp
 
 HEADERS += \
+    message.h \
+    user.h \
     widget.h
 
 # Default rules for deployment.

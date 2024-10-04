@@ -43,9 +43,14 @@ void Widget::clientConnect() {
     connect(client, SIGNAL(disconnected()), SLOT(clientDisconnect()));
     connect(client, SIGNAL(readyRead()), SLOT(broadcastChat()));
     label->setText("new connection established!");
+
+    // 입장 알림
+    broadcast(client->peerAddress().toString() + " entered chat");
 }
 
 void Widget::broadcastChat() {
+    // client가 보낸 무언가가 있으면 읽어서 broadcast
+
     QTcpSocket *client = (QTcpSocket *)sender();
     if (client->bytesAvailable() > BLOCK_SIZE)
         return;
@@ -57,14 +62,30 @@ void Widget::broadcastChat() {
         client->write(bytearray);
     }
 
+    // DB 삽입
+
     label->setText(QString(bytearray));
 }
 
 void Widget::clientDisconnect() {
     QTcpSocket *client = (QTcpSocket *)sender();
+
+    // 퇴장 알림
+    broadcast(client->peerAddress().toString() + " left chat");
+
     client->deleteLater();
-    clients.removeOne(client);
-    // 클라이언트 배열에서 삭제
+    clients.removeOne(client);  // 클라이언트 배열에서 삭제
+}
+
+//
+void Widget::broadcast(QString msg) {
+    QByteArray byte = msg.toUtf8();
+
+    for (const auto& client : clients) {
+        client->write(byte);
+    }
+
+    label->setText(msg);
 }
 
 Widget::~Widget() {}

@@ -23,5 +23,7 @@ private:
     QLabel *label;
     QVector<QTcpSocket *> clients;
 
+    void broadcast(QString msg);
+
 };
 #endif // WIDGET_H
